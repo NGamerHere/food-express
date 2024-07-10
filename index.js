@@ -9,6 +9,7 @@ const app = express();
 app.use(bodyParser.json());
 
 app.set('view engine','ejs');
+app.use(express.static('public'))
 
 const pool = mysql.createPool({
     host: process.env.DBHOST,
@@ -23,7 +24,7 @@ app.use(session({
     secret: process.env.SESSIONKEY,
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 60000 } // session timeout of 60 seconds
+    cookie: { maxAge: 6000000 }
 }));
 
 
@@ -39,6 +40,17 @@ app.get('/registration',(req, res)=>{
     res.render('registration');
 })
 
+app.get('/dashboard', async (req, res) => {
+    if (req.session.userId) {
+        //console.log(req.session.userId);
+        const [name] = await pool.query('SELECT name FROM users WHERE id = ?', [req.session.userId]);
+        console.log(name);
+        res.render('dashboard', { name: name[0]['name'] });
+    } else {
+        res.redirect('/login');
+    }
+});
+
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
     try {
@@ -48,8 +60,8 @@ app.post('/login', async (req, res) => {
         if (user) {
             const match = await bcrypt.compare(password, user.password);
             if (match) {
-                req.session.id=user['_id'];
-                res.json({ message: 'You have access' });
+                req.session.userId = user.id;
+                res.json({ message: 'done' });
             } else {
                 res.json({ message: 'Wrong password' });
             }
@@ -69,15 +81,15 @@ app.get('/logout',(req, res)=>{
 
 app.post('/registration', async (req, res) => {
     try {
-        const { username, password, name } = req.body;
+        const { username, password, name ,phone,email } = req.body;
         const [existingUsers] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
         if (existingUsers.length > 0) {
             return res.status(409).json({ message: 'Username already exists' });
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const [result] = await pool.query(
-            'INSERT INTO users (username, name, password) VALUES (?, ?, ?)',
-            [username, name, hashedPassword]
+            'INSERT INTO users (username, name, password,phone,email) VALUES (?, ?, ?,?,?)',
+            [username, name, hashedPassword,phone,email]
         );
         res.status(201).json({ message: 'User created successfully', userId: result.insertId });
     } catch (error) {
