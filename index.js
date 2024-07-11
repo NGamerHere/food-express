@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
 const session=require('express-session');
+const {del} = require("express/lib/application");
 require('dotenv').config();
 
 const app = express();
@@ -111,14 +112,26 @@ app.post('/editQuantity',async (req,res)=>{
                 res.status(500).json({'message':'cant be able to edit the quantity'})
             }
         }
-
-
    } catch (e) {
         if(e.error.code === 'ER_CHECK_CONSTRAINT_VIOLATED'){
             return  res.status(500).json({message:'you can add the only 10 items in the cart'})
         }
         console.error('error in editing the quantity : '+e);
         res.status(500).json({message:'internal server error',error:e})
+    }
+});
+
+app.post('/deleteItemsFromCart',async (req,res)=>{
+    const cartID=req.body.cartID;
+    try{
+        const [deleteQuery]=await pool.query('DELETE FROM cart WHERE cartID=?',[cartID])
+        if(deleteQuery.affectedRows){
+            res.json({'message':'done'});
+        }else{
+            res.send({'message':'item not found in the cart'});
+        }
+    }catch (e) {
+        console.log('error in deleting the items cart from the '+e);
     }
 });
 
