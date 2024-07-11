@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
 const session=require('express-session');
-const {del} = require("express/lib/application");
+const login = require("./login");
 require('dotenv').config();
 
 const app = express();
@@ -28,6 +28,8 @@ app.use(session({
     cookie: { maxAge: 6000000 }
 }));
 
+app.use(login);
+
 
 app.get('/',(req, res)=>{
     if(req.session.userId){
@@ -36,14 +38,12 @@ app.get('/',(req, res)=>{
     res.render('home',{name:'datta'});
 })
 
-app.get('/login',(req, res)=>{
-    if(req.session.userId){
-        return res.redirect('/dashboard');
-    }
-    res.render('login');
-})
+
 
 app.get('/registration',(req, res)=>{
+    if(req.session.userId){
+       return res.redirect('/dashboard');
+    }
     res.render('registration');
 })
 
@@ -57,9 +57,7 @@ app.get('/cart',(req,res)=>{
 
 app.get('/dashboard', async (req, res) => {
     if (req.session.userId) {
-        //console.log(req.session.userId);
         const [name] = await pool.query('SELECT name FROM users WHERE id = ?', [req.session.userId]);
-        console.log(name);
         res.render('dashboard', { name: name[0]['name'] });
     } else {
         res.redirect('/login');
@@ -135,28 +133,6 @@ app.post('/deleteItemsFromCart',async (req,res)=>{
     }
 });
 
-app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-    try {
-        const [rows] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
-        const user = rows[0];
-
-        if (user) {
-            const match = await bcrypt.compare(password, user.password);
-            if (match) {
-                req.session.userId = user.id;
-                res.json({ message: 'done' });
-            } else {
-                res.json({ message: 'Wrong password' });
-            }
-        } else {
-            res.json({ message: 'Username not found' });
-        }
-    } catch (error) {
-        console.error('Signin error:', error);
-        res.status(500).json({ message: 'An error occurred during signin' });
-    }
-});
 
 app.get('/logout',(req, res)=>{
     req.session.destroy();
