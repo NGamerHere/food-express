@@ -80,7 +80,7 @@ app.post('/addItemToCart',async (req,res)=>{
         }else{
             const [result]=await pool.query('INSERT INTO cart (userid, itemid, quantity) VALUES (?,?,?)',[userid,itemID,1]);
             if(result.insertId > 0){
-                res.json({'message':'done',result:result});
+                res.json({'message':'done'});
             }else{
                 result.status(500).json({'message':'internal Server Error'})
             }
@@ -90,6 +90,37 @@ app.post('/addItemToCart',async (req,res)=>{
         console.error('error in adding items into the cart '+e);
     }
 })
+
+app.post('/editQuantity',async (req,res)=>{
+    const userid=req.session.userId;
+    const itemID=req.body.itemID;
+    const action=req.body.action;
+    try{
+        if(action === 'add'){
+            const [query]=await pool.query('UPDATE cart SET quantity=quantity+1 WHERE userid=? AND itemid=?;',[userid,itemID]);
+            if(query.changedRows > 0){
+                res.json({'message':'done'});
+            }else{
+                res.status(500).json({'message':'cant be able to edit the quantity'})
+            }
+        }else if(action === 'delete'){
+            const [query]=await pool.query('UPDATE cart SET quantity=quantity-1 WHERE userid=? AND itemid=?;',[userid,itemID]);
+            if(query.changedRows > 0){
+                res.json({'message':'done'});
+            }else{
+                res.status(500).json({'message':'cant be able to edit the quantity'})
+            }
+        }
+
+
+   } catch (e) {
+        if(e.error.code === 'ER_CHECK_CONSTRAINT_VIOLATED'){
+            return  res.status(500).json({message:'you can add the only 10 items in the cart'})
+        }
+        console.error('error in editing the quantity : '+e);
+        res.status(500).json({message:'internal server error',error:e})
+    }
+});
 
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
