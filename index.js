@@ -71,7 +71,7 @@ app.post('/addItemToCart',async (req,res)=>{
     const itemID=req.body.itemID;
     try{
         const [searchQuery]=await pool.query('SELECT * FROM cart WHERE userid=? AND itemID=?',[userid,itemID]);
-        if(searchQuery){
+        if(searchQuery.length > 0){
             const [updateQuery]=await pool.query('UPDATE cart SET quantity=quantity+1 WHERE cartID=?',[searchQuery[0]['cartID']]);
             if(updateQuery.changedRows > 0){
                 res.json({message:'done'});
@@ -87,7 +87,7 @@ app.post('/addItemToCart',async (req,res)=>{
             }
         }
     }catch (e){
-        res.json("internal server error");
+        res.status(500).json("internal server error");
         console.error('error in adding items into the cart '+e);
     }
 })
