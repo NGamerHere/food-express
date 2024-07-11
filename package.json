@@ -2,9 +2,9 @@
   "name": "onlinefood",
   "version": "1.0.0",
   "description": "this is node js project for the online food delivery and admin dashboard for the restarunt for hosting there foods",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "nodemon index.js",
+    "start": "nodemon src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "n datta sai ram kumar",
