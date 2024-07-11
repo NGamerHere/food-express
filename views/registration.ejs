@@ -105,6 +105,9 @@
             username:username
         }).then(response=>{
             console.log(response.data);
+            if(response.data.message === 'done'){
+                window.location.href='/login';
+            }
         }).catch(error=>{
             console.log(error);
         });

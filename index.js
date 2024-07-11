@@ -29,16 +29,30 @@ app.use(session({
 
 
 app.get('/',(req, res)=>{
+    if(req.session.userId){
+        return res.redirect('/dashboard');
+    }
     res.render('home',{name:'datta'});
 })
 
 app.get('/login',(req, res)=>{
+    if(req.session.userId){
+        return res.redirect('/dashboard');
+    }
     res.render('login');
 })
 
 app.get('/registration',(req, res)=>{
     res.render('registration');
 })
+
+app.get('/cart',(req,res)=>{
+    if(req.session.userId){
+        res.render('cart')
+    }else{
+        res.redirect('/login');
+    }
+});
 
 app.get('/dashboard', async (req, res) => {
     if (req.session.userId) {
@@ -91,10 +105,31 @@ app.post('/registration', async (req, res) => {
             'INSERT INTO users (username, name, password,phone,email) VALUES (?, ?, ?,?,?)',
             [username, name, hashedPassword,phone,email]
         );
-        res.status(201).json({ message: 'User created successfully', userId: result.insertId });
+        res.status(201).json({ message: 'done', userId: result.insertId });
     } catch (error) {
         console.error('Signup error:', error);
         res.status(500).json({ message: 'An error occurred during signup' });
+    }
+});
+
+app.get('/getCategories',async (req,res)=>{
+    try{
+        const [result]=await pool.query('SELECT * FROM categories');
+        res.json(result);
+    }catch (e) {
+        res.status(500).send({message:'internalServerError'})
+        console.error('error in fetching the all the categories '+e)
+    }
+})
+
+app.get('/getItems',async (req,res)=>{
+    const categoriesID=req.query.categoriesID;
+    try{
+        const [result]=await pool.query('SELECT * FROM items WHERE categoriesID=?',[categoriesID]);
+        res.json(result);
+    }catch (e) {
+        res.status(500).send({message:'internalServerError'})
+        console.error('error in fetching the all the categories '+e)
     }
 });
 
