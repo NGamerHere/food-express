@@ -100,7 +100,6 @@
                    onclick="itemFetcher(${item.categoriesID}, '${item.categoriesName}')">${item.categoriesName}</div>`;
             });
             document.getElementById('categoriesDiv').innerHTML = str;
-            // Pass both ID and Name of the first category
             itemFetcher(firstCategory.categoriesID, firstCategory.categoriesName);
         }).catch((e) => {
             console.error('error in fetching the categories ' + e);
@@ -137,7 +136,14 @@
 
 
     function addToCart(id) {
-        alert(id);
+        axios.post('/addItemToCart',{itemID:id}).then((res)=>{
+              console.log(res.data);
+              if(res.data.message === 'done'){
+                  alert('item was added into cart');
+              }
+        }).catch((e)=>{
+            console.error('error in adding items into the cart : '+e);
+        })
     }
 
     categories();

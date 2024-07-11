@@ -1,11 +1,13 @@
 const express=require('express');
-const pool=require('../db')
+const pool=require('../db');
+const getName=require('../components/getName');
 
 const cart=express.Router();
 
-cart.get('/cart',(req,res)=>{
+cart.get('/cart',async (req,res)=>{
     if(req.session.userId){
-        res.render('cart')
+        const [name]=await pool.query('SELECT name FROM users where id=?',[req.session.userId]);
+        res.render('cart',{name:name[0]['name']})
     }else{
         res.redirect('/login');
     }
@@ -84,7 +86,7 @@ cart.post('/deleteItemsFromCart',async (req,res)=>{
 
 cart.get('/getCartdetails',async (req,res)=>{
    try{
-       const [result]=await pool.query('SELECT cart.cartID,cart.itemid, items.itemName, items.itemPrice \n' +
+       const [result]=await pool.query('SELECT cart.*, items.itemName, items.itemPrice \n' +
            'FROM cart\n' +
            'INNER JOIN items ON cart.itemid = items.itemID where userid=?',[req.session.userId]);
        return res.json(result);
