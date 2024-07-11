@@ -2,7 +2,7 @@ const express=require('express');
 const bcrypt = require("bcrypt");
 const pool=require('../db');
 
-const login=express();
+const login=express.Router();
 
 login.get('/login',(req, res)=>{
     if(req.session.userId){

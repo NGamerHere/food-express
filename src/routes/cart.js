@@ -1,7 +1,7 @@
 const express=require('express');
 const pool=require('../db')
 
-const cart=express();
+const cart=express.Router();
 
 cart.get('/cart',(req,res)=>{
     if(req.session.userId){

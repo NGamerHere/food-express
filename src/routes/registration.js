@@ -1,7 +1,7 @@
 const express=require('express');
 const bcrypt = require("bcrypt");
 
-const registration=express();
+const registration=express.Router();
 
 registration.get('/registration',(req, res)=>{
     if(req.session.userId){
