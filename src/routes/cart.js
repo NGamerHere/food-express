@@ -80,3 +80,5 @@ cart.post('/deleteItemsFromCart',async (req,res)=>{
         console.log('error in deleting the items cart from the '+e);
     }
 });
+
+module.exports=cart;
