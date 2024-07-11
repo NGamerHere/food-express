@@ -65,6 +65,32 @@ app.get('/dashboard', async (req, res) => {
     }
 });
 
+app.post('/addItemToCart',async (req,res)=>{
+    const userid=req.session.userId;
+    const itemID=req.body.itemID;
+    try{
+        const [searchQuery]=await pool.query('SELECT * FROM cart WHERE userid=? AND itemID=?',[userid,itemID]);
+        if(searchQuery){
+            const [updateQuery]=await pool.query('UPDATE cart SET quantity=quantity+1 WHERE cartID=?',[searchQuery[0]['cartID']]);
+            if(updateQuery.changedRows > 0){
+                res.json({message:'done'});
+            }else{
+                res.status(500).json({message:'internal server error'})
+            }
+        }else{
+            const [result]=await pool.query('INSERT INTO cart (userid, itemid, quantity) VALUES (?,?,?)',[userid,itemID,1]);
+            if(result.insertId > 0){
+                res.json({'message':'done',result:result});
+            }else{
+                result.status(500).json({'message':'internal Server Error'})
+            }
+        }
+    }catch (e){
+        res.json("internal server error");
+        console.error('error in adding items into the cart '+e);
+    }
+})
+
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
     try {
