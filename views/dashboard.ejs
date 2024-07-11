@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>dashboard - FoodExpress</title>
@@ -22,6 +23,7 @@
         }
         #categoriesDiv {
             padding: 15px;
+
         }
         #categoriesDiv div {
             cursor: pointer;
@@ -29,7 +31,6 @@
             margin-bottom: 5px;
             background-color: #e9ecef;
             border-radius: 5px;
-
         }
         #itemsPlace {
             display: flex;
@@ -76,7 +77,10 @@
             <!-- Categories will be populated here -->
         </div>
         <div class="col-md-10">
-            <div id="itemsPlace" class="row">
+            <div>
+                <h3 class="fw-bold" id="categoryTitle" style="margin-left: 15px"></h3>
+            </div>
+            <div id="itemsPlace" class="row g-3">
                 <!-- Items will be populated here -->
             </div>
         </div>
@@ -84,26 +88,36 @@
 </div>
 
 <script>
-    async function categories(){
-        await axios.get('/getCategories').then((response)=>{
+    let activeTab=1;
+    async function categories() {
+        await axios.get('/getCategories').then((response) => {
             console.log(response.data);
-            let str=`<div class="text-center fw-bold"> Categories </div>`;
+            let str = `<div class="text-center fw-bold"> Categories </div>`;
+            const firstCategory = response.data[0];
 
-            response.data.forEach((item)=>{
-                str += `<div onclick="itemFetcher(${item.categoriesID})">${item.categoriesName}</div>`;
+            response.data.forEach((item) => {
+                str += `<div id="categories-${item.categoriesID}"
+                   onclick="itemFetcher(${item.categoriesID}, '${item.categoriesName}')">${item.categoriesName}</div>`;
             });
-            document.getElementById('categoriesDiv').innerHTML=str;
-            itemFetcher(1);
-        }).catch((e)=>{
-            console.error('error in fetching the categories '+e);
+            document.getElementById('categoriesDiv').innerHTML = str;
+            // Pass both ID and Name of the first category
+            itemFetcher(firstCategory.categoriesID, firstCategory.categoriesName);
+        }).catch((e) => {
+            console.error('error in fetching the categories ' + e);
         })
     }
-    async function itemFetcher(categorieID){
-        document.getElementById('itemsPlace').innerHTML='';
-        await axios.get('/getItems?categoriesID='+categorieID).then((response)=>{
+
+    async function itemFetcher(categorieID, categorieName) {
+        console.log(categorieName);
+        document.getElementById('categories-'+activeTab).removeAttribute('style');
+        document.getElementById('itemsPlace').innerHTML = '';
+        document.getElementById('categories-'+categorieID).style.backgroundColor='#BBE9FF';
+        activeTab=categorieID;
+        await axios.get('/getItems?categoriesID=' + categorieID).then((response) => {
             console.log(response.data);
-            let str='';
-            response.data.forEach((item)=>{
+            document.getElementById('categoryTitle').innerHTML = categorieName;
+            let str = '';
+            response.data.forEach((item) => {
                 str += `
                 <div class="item-card">
                     <div class="card">
@@ -115,14 +129,15 @@
                     </div>
                 </div>`;
             })
-            document.getElementById('itemsPlace').innerHTML=str;
-        }).catch((e)=>{
-            console.error('error in the fetching the items '+e);
+            document.getElementById('itemsPlace').innerHTML = str;
+        }).catch((e) => {
+            console.error('error in the fetching the items ' + e);
         })
     }
 
-    function addToCart(id){
-            alert(id);
+
+    function addToCart(id) {
+        alert(id);
     }
 
     categories();
