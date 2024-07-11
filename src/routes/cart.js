@@ -77,8 +77,21 @@ cart.post('/deleteItemsFromCart',async (req,res)=>{
             res.send({'message':'item not found in the cart'});
         }
     }catch (e) {
+        res.status(500).json({message:'internal server error',error:e})
         console.log('error in deleting the items cart from the '+e);
     }
+});
+
+cart.get('/getCartdetails',async (req,res)=>{
+   try{
+       const [result]=await pool.query('SELECT cart.cartID,cart.itemid, items.itemName, items.itemPrice \n' +
+           'FROM cart\n' +
+           'INNER JOIN items ON cart.itemid = items.itemID where userid=?',[req.session.userId]);
+       return res.json(result);
+   } catch (e) {
+       res.status(500).json({message:'internal server error',error:e})
+       console.log('error in fetching the items cart from the '+e);
+   }
 });
 
 module.exports=cart;
