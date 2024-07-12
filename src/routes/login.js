@@ -24,10 +24,10 @@ login.post('/login',loginAPIHandle, async (req, res) => {
                 req.session.userId = user.id;
                 res.json({ message: 'done' });
             } else {
-                res.json({ message: 'Wrong password' });
+                res.json({ message: 'Wrong password' ,err:'password'});
             }
         } else {
-            res.json({ message: 'Username not found' });
+            res.json({ message: 'Username not found' ,err:'username'});
         }
     } catch (error) {
         console.error('Signin error:', error);
