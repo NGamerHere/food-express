@@ -1,6 +1,5 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const pool=require('./db');
 const session=require('express-session');
 const login = require("./routes/login");
 const registration=require('./routes/registration');
