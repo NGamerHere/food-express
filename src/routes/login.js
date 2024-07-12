@@ -1,18 +1,19 @@
 const express=require('express');
 const bcrypt = require("bcrypt");
 const pool=require('../db');
+const {loginMiddlewareHandle,loginAPIHandle}=require('../middleware/loginMiddlewareHandle');
+
 
 const login=express.Router();
 
-login.get('/login',(req, res)=>{
-    if(req.session.userId){
-        return res.redirect('/dashboard');
-    }
+
+
+login.get('/login',loginMiddlewareHandle,(req, res)=>{
     res.render('login');
 })
 
 
-login.post('/login', async (req, res) => {
+login.post('/login',loginAPIHandle, async (req, res) => {
     const { username, password } = req.body;
     try {
         const [rows] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);

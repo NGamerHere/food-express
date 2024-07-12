@@ -1,21 +1,15 @@
 const express=require('express')
 const pool=require('../db');
-function login(req, res,next){
-    if(req.session.userId){
-        next();
-    }else{
-        return res.status(401).send('Not logged in');
-    }
-}
+const ordersHandle=require('../middleware/ordersHandle');
 
 const orders=express.Router();
 
-orders.get('/orders',login,(req,res)=>{
+orders.get('/orders',orders,(req,res)=>{
    res.render('orders');
 });
 
 
-orders.post('/checkout',login,async (req, res)=>{
+orders.post('/checkout',ordersHandle,async (req, res)=>{
     const userID=req.session.userId;
     try{
         const [result]=await pool.query('select cart.*,i.itemPrice  from cart inner join foodexpress.items i on cart.itemid = i.itemID where userid=?;',[req.session.userId]);
@@ -39,7 +33,7 @@ orders.post('/checkout',login,async (req, res)=>{
         res.json({error:e});
     }
 });
-orders.get('/getOrders',login,async (req,res)=>{
+orders.get('/getOrders',ordersHandle,async (req,res)=>{
     try{
         const [result]=await pool.query('SELECT * FROM orders WHERE userid=?;',[req.session.userId]);
         res.json(result);
@@ -49,7 +43,7 @@ orders.get('/getOrders',login,async (req,res)=>{
     }
 })
 
-orders.get('/getOrderItems',login,async (req,res)=>{
+orders.get('/getOrderItems',ordersHandle,async (req,res)=>{
    try{
        const [result]=await pool.query('SELECT i.itemName,i.itemPrice,quantity FROM orderitems INNER JOIN foodexpress.items i on orderitems.itemID=i.itemID WHERE userID=? AND orderID=?;',[req.session.userId,req.query.OrderID]);
        res.json(result);
