@@ -1,4 +1,5 @@
 const express=require('express');
+const pool=require('../db')
 const bcrypt = require("bcrypt");
 
 const registration=express.Router();
