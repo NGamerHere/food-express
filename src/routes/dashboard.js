@@ -14,9 +14,11 @@ dashboard.get('/dashboard',dashboardSessionHandle, async (req, res) => {
 
 
 
-dashboard.get('/logout',(req, res)=>{
+dashboard.get('/logout',async (req, res)=>{
+    const [loggerOut]=await pool.query('DELETE FROM loginDetails WHERE id = ?',[req.session.loggerID]);
     req.session.destroy();
-    res.redirect('/');
+    //res.redirect('/');
+    res.send({loggerOut:loggerOut});
 })
 
 module.exports=dashboard;

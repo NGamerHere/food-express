@@ -6,8 +6,6 @@ const {loginMiddlewareHandle,loginAPIHandle}=require('../middleware/loginMiddlew
 
 const login=express.Router();
 
-
-
 login.get('/login',loginMiddlewareHandle,(req, res)=>{
     res.render('login');
 })
@@ -22,6 +20,8 @@ login.post('/login',loginAPIHandle, async (req, res) => {
             const match = await bcrypt.compare(password, user.password);
             if (match) {
                 req.session.userId = user.id;
+                const [logger]=await pool.query('INSERT INTO loginDetails (userid,status,loginIP) VALUES (?,?,?) ',[req.session.userId,'active',req.ip.slice(7)]);
+                req.session.loggerID=logger.insertId;
                 res.json({ message: 'done' });
             } else {
                 res.json({ message: 'Wrong password' ,err:'password'});
