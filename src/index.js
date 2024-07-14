@@ -7,6 +7,7 @@ const cart=require('./routes/cart');
 const dashboard=require('./routes/dashboard');
 const categories=require('./routes/categories');
 const orders=require("./routes/orders");
+const profile=require("./routes/profile");
 require('dotenv').config();
 
 const app = express();
@@ -30,6 +31,7 @@ app.use(dashboard);
 app.use(cart);
 app.use(categories);
 app.use(orders);
+app.use(profile);
 
 
 const port = process.env.PORT;
