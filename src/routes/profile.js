@@ -15,6 +15,16 @@ profile.get('/profile',profileSessionHandler,async (req,res)=>{
     res.render('profile');
 });
 
+profile.get('/getProfile',async (req,res)=>{
+   const userid=req.session.userId;
+   const [userdetails]=await pool.query('SELECT name,username,email,phone FROM users  WHERE id=?',[userid]);
+   if(userid){
+       return res.json(userdetails);
+   }else{
+       return res.json({message:'you have not logged in',err:'notFound'});
+   }
+});
+
 profile.post('/appAddress',async (req, res)=>{
     const { houseNO, streetName, areaName, landmark, city, district, state, pincode,country}=req.body;
 
