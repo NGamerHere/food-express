@@ -9,6 +9,8 @@ const categories=require('./routes/categories');
 const orders=require("./routes/orders");
 const restaurant=require('./routes/restaurant');
 const sessionStore=require('./components/sessionStore');
+const state=require('./routes/states');
+const city=require('./routes/city')
 require('dotenv').config();
 
 const app = express();
@@ -34,6 +36,8 @@ app.use(cart);
 app.use(categories);
 app.use(orders);
 app.use(restaurant);
+app.use(state)
+app.use(city)
 
 
 const port = process.env.PORT;
