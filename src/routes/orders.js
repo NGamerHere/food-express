@@ -4,7 +4,7 @@ const ordersHandle=require('../middleware/ordersHandle');
 
 const orders=express.Router();
 
-orders.get('/orders',orders,(req,res)=>{
+orders.get('/orders',ordersHandle,(req,res)=>{
    res.render('orders');
 });
 
@@ -18,9 +18,6 @@ orders.post('/checkout',ordersHandle,async (req, res)=>{
         }
         const [orderCreation]=await pool.query('INSERT INTO orders (userid,totalAmount) VALUES (?,?)',[userID,req.body.totalAmount])
         const orderID=orderCreation.insertId;
-        //console.log(orderID);
-
-        //res.json([orderCreation,result]);
         for (const item of result) {
             const [insertQuery]=await pool.query('INSERT INTO orderItems(orderID, userID, itemID, quantity, itemPrice) VALUE (?,?,?,?,?) ',
                 [orderID,userID, item.itemid, item.quantity,item.itemPrice ]  );

@@ -7,6 +7,8 @@ const cart=require('./routes/cart');
 const dashboard=require('./routes/dashboard');
 const categories=require('./routes/categories');
 const orders=require("./routes/orders");
+const restaurant=require('./routes/restaurant');
+const sessionStore=require('./components/sessionStore');
 require('dotenv').config();
 
 const app = express();
@@ -21,7 +23,8 @@ app.use(session({
     secret: process.env.SESSIONKEY,
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 6000000 }
+    store:sessionStore,
+    cookie: { maxAge: 1000 * 60 * 60 * 24 * 7}
 }));
 
 app.use(login);
@@ -30,6 +33,7 @@ app.use(dashboard);
 app.use(cart);
 app.use(categories);
 app.use(orders);
+//app.use(restaurant);
 
 
 const port = process.env.PORT;
