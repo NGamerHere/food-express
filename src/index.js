@@ -33,7 +33,7 @@ app.use(dashboard);
 app.use(cart);
 app.use(categories);
 app.use(orders);
-//app.use(restaurant);
+app.use(restaurant);
 
 
 const port = process.env.PORT;
