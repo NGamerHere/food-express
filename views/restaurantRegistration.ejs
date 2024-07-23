@@ -1,0 +1,182 @@
+<html lang="en">
+<head>
+    <title>Register - FoodExpress</title>
+    <link href="https://cdn.jsdelivr.net/npm/fastbootstrap@2.2.0/dist/css/fastbootstrap.min.css" rel="stylesheet" integrity="sha256-V6lu+OdYNKTKTsVFBuQsyIlDiRWiOmtC8VQ8Lzdm2i4=" crossorigin="anonymous">
+    <link rel="icon" href="/icons8-deliver-food-96.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playwrite+CU:wght@100..400&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: "Roboto", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+            background-color: #f8f9fa;
+        }
+        .register-container {
+            width: 600px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .app-name {
+            font-family: "Playwrite CU", cursive;
+            font-weight: 400;
+            color: #ff6b6b;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+<div class="d-flex justify-content-center" style=" padding: 20px 0;">
+    <div class="register-container p-5">
+        <h1 class="text-center app-name">FoodExpress</h1>
+        <h2 class="text-center mb-4">Add the restaturant</h2>
+        <form>
+            <div class="mb-3">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="restaurantName" placeholder="restaurantName" required />
+                    <label for="restaurantName">restaurant Name</label>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="ownerName" placeholder="ownerName" required />
+                    <label for="ownerName">owner Name</label>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div id="emailError" class="text-danger text-center" style="display: none"> <p>this email already exists</p> </div>
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="email" placeholder="name@example.com" required />
+                    <label for="email">Email address</label>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div id="usernameError" class="text-danger text-center" style="display: none"> <p>this username already exists</p> </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="fassiID" placeholder="fassi ID"  required />
+                    <label for="fassiID">FASSI code</label>
+                </div>
+            </div>
+            <div class="mb-3">
+
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="password" placeholder="Password" required />
+                    <label for="password">Password</label>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div id="passwordError" class="text-danger text-center" style="display: none"> <p>passwords didnt matched</p> </div>
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="repassword" placeholder="Confirm Password" required />
+                    <label for="repassword">Confirm Password</label>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div id="phoneError" class="text-danger text-center" style="display: none"> <p>this phone already exists</p> </div>
+                <div class="form-floating mb-3">
+                    <input type="tel" class="form-control" id="phone" placeholder="Phone Number" required />
+                    <label for="phone">Phone Number</label>
+                </div>
+            </div>
+            <div class="mb-3">
+                <select class="form-select" aria-label="select the state" id="state" onchange="citiFetcher()">
+                </select>
+            </div>
+            <div class="mb-3">
+                <select class="form-select form-select-lg" aria-label="select the state" id="cities">
+                </select>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="termsAgree" required>
+                <label class="form-check-label" for="termsAgree">I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and <a href="#" class="text-decoration-none">Privacy Policy</a></label>
+            </div>
+
+            <button type="submit" onclick="registrationHandle(event)" class="btn btn-primary w-100 mb-3">Sign Up</button>
+        </form>
+        <hr>
+        <div class="text-center">
+            <p>Already have an account? <a href="/login" class="text-decoration-none">Log in</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function registrationHandle(event){
+
+        event.preventDefault();
+        clearError();
+        const name=document.getElementById('name').value;
+        const email=document.getElementById('email').value;
+        const password=document.getElementById('password').value;
+        const repassword=document.getElementById('repassword').value;
+        const phone=document.getElementById('phone').value;
+        const username=document.getElementById('username').value;
+        if(password!== repassword){
+            document.getElementById('repassword').classList.add('border-danger');
+            document.getElementById('passwordError').style.display='block';
+            return;
+        }
+        axios.post('/registration',{
+            name:name,
+            email:email,
+            password:password,
+            phone:phone,
+            username:username
+        }).then(response=>{
+            console.log(response.data);
+            if(response.data.message === 'done'){
+                window.location.href='/login';
+            }
+        }).catch(error=>{
+            console.error(error.response.data);
+            if(error.response.data.err){
+                document.getElementById(error.response.data.err).classList.add('border-danger');
+                document.getElementById(error.response.data.err+'Error').style.display='block';
+            }
+        });
+    }
+    function clearError(){
+        document.getElementById('passwordError').style.display='none';
+        document.getElementById('repassword').classList.remove('border-danger');
+        document.getElementById('emailError').style.display='none';
+        document.getElementById('email').classList.remove('border-danger');
+        document.getElementById('phoneError').style.display='none';
+        document.getElementById('phone').classList.remove('border-danger');
+        document.getElementById('usernameError').style.display='none';
+        document.getElementById('username').classList.remove('border-danger');
+    }
+    function stateFetcher(){
+        const select= document.getElementById('state');
+        axios.get('/api/getStates').then((res)=>{
+            let str='';
+            console.log(res.data);
+            res.data.forEach((item)=>{
+                str=str+`<option value="${item.id}" >${item.stateName}</option>`;
+            })
+            select.innerHTML=str;
+        }).catch((e)=>{
+            console.error(e);
+        })
+    }
+    function citiFetcher(){
+        const stateID=document.getElementById('state').value;
+        alert(stateID);
+    }
+
+    document.addEventListener("DOMContentLoaded", (event) => {
+        stateFetcher();
+    });
+
+
+
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>

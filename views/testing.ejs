@@ -8,6 +8,13 @@
 <input type="text" id="autocomplete" placeholder="Select a color..."></input>
 <ul id="results"></ul>
 
+
+<select aria-label="Default select example" id="state" onchange="klm()">
+    <option> select the state  </option>
+</select>
+<select id="city" disabled>
+<option> select the state first </option>
+</select>
 <script>
     const data = ["red", "blue", "green", "yellow", "purple", "orange", "black", "white", "brown"];
     const autocomplete = document.getElementById("autocomplete");
@@ -40,6 +47,43 @@
         autocomplete.value = event.target.innerText;
         this.innerHTML = "";
     };
+    function ds(){
+        const select= document.getElementById('state');
+
+        axios.get('/api/getStates').then((res)=>{
+            let str='';
+            console.log(res.data);
+            res.data.forEach((item)=>{
+                str=str+`<option value="${item.id}" >${item.stateName}</option>`;
+            })
+            select.innerHTML=str;
+        }).catch((e)=>{
+          console.error(e);
+        })
+    }
+    function klm(){
+        const id=document.getElementById('state').value;
+        const city=document.getElementById('city');
+        city.removeAttribute('disabled')
+        axios.get('/api/getCitiesBystate?stateID='+id).then((res)=>{
+            console.log(res.data);
+            let str='';
+            console.log(res.data);
+            res.data.forEach((item)=>{
+                str=str+`<option value="${item.id}" >${item.cityName}</option>`;
+            })
+            city.innerHTML=str;
+        }).catch((e)=>{
+          console.error("error in fetching the data"+ e);
+        })
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+
+        ds();
+        const citySelect = document.getElementById('city');
+        citySelect.setAttribute('disabled', 'disabled'); // Explicitly disable the select element
+    });
+
 </script>
 
 </body>

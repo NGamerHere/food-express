@@ -20,11 +20,11 @@ registration.post('/registration', async (req, res) => {
         }
         const [emailCheck]=await pool.query('SELECT * FROM users WHERE email = ?', [email]);
         if (emailCheck.length > 0) {
-            return res.status(409).json({ message: 'Username already exists',err:'email' });
+            return res.status(409).json({ message: 'email already exists',err:'email' });
         }
         const [phoneCheck]=await pool.query('SELECT * FROM users WHERE phone = ?', [phone]);
         if (phoneCheck.length > 0) {
-            return res.status(409).json({ message: 'Username already exists' , err:'phone'});
+            return res.status(409).json({ message: 'phone already exists' , err:'phone'});
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const [result] = await pool.query(
