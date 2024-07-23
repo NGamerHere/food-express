@@ -1,0 +1,46 @@
+<html lang="en" >
+<head>
+    <title>testing</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.js" integrity="sha512-vHNHepeQWwAggJlhEk932jRS5sNdn/Nn4F+w4TpXW5dA+04qnd3e7YpfXo6auWhFG6z3FVhmScG4ovtF+qYeZw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+<h1>hello there</h1>
+<input type="text" id="autocomplete" placeholder="Select a color..."></input>
+<ul id="results"></ul>
+
+<script>
+    const data = ["red", "blue", "green", "yellow", "purple", "orange", "black", "white", "brown"];
+    const autocomplete = document.getElementById("autocomplete");
+    const resultsHTML = document.getElementById("results");
+    autocomplete.oninput = function () {
+        let results = [];
+        const userInput = this.value;
+        resultsHTML.innerHTML = "";
+        if (userInput.length > 0) {
+            results = getResults(userInput);
+            resultsHTML.style.display = "block";
+            for (let i = 0; i < results.length; i++) {
+                resultsHTML.innerHTML += "<li>" + results[i] + "</li>";
+            }
+        }
+    };
+    function getResults(input) {
+        var results = [];
+        axios.get('/api/autocomplete/getCities?apl='+input).then((res)=>{
+            results=res.data;
+            console.log(results);
+        }).catch((e)=>{
+            console.error(e)
+        })
+
+
+        return results;
+    }
+    resultsHTML.onclick = function (event) {
+        autocomplete.value = event.target.innerText;
+        this.innerHTML = "";
+    };
+</script>
+
+</body>
+</html>
