@@ -1,8 +1,8 @@
 <html lang="en">
 <head>
-    <title>Login - FoodExpress</title>
+    <title>Restaurant Login - FoodExpress</title>
     <link href="https://cdn.jsdelivr.net/npm/fastbootstrap@2.2.0/dist/css/fastbootstrap.min.css" rel="stylesheet" integrity="sha256-V6lu+OdYNKTKTsVFBuQsyIlDiRWiOmtC8VQ8Lzdm2i4=" crossorigin="anonymous">
-    <link rel="icon" href="/icons8-deliver-food-96.png">
+    <link rel="icon" href="/icons8-restaurant-96.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js" integrity="sha512-dGk3EJL6zKjzYBDt4CeT/O4GkAEtIWaC+eLJF1JXTN4fMYxZKfKl2qlTO8+qKxJBc1+ZG+OqXtJnHPEgyNIKKg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,8 +48,8 @@
         <form>
             <div class="mb-3">
                 <div class="form-floating mb-3">
-                    <input type="email" class="form-control" id="username" placeholder="username" required />
-                    <label for="username">username</label>
+                    <input type="email" class="form-control" id="email" placeholder="email" required />
+                    <label for="email">email</label>
                 </div>
             </div>
             <div class="mb-3">
@@ -65,7 +65,7 @@
         </form>
         <hr>
         <div class="text-center">
-            <p>Do you want to add your restaurant to our platform? <a href="/registration" class="text-decoration-none">click here</a></p>
+            <p>Do you want to add your restaurant to our platform? <a href="/restaurant/registration" class="text-decoration-none">click here</a></p>
         </div>
     </div>
 </div>
@@ -74,18 +74,16 @@
     function loginHandle(event){
         event.preventDefault();
         clearError();
-        const username=document.getElementById('username').value;
+        const email=document.getElementById('email').value;
         const password=document.getElementById('password').value;
-        const isChecked=document.getElementById('rememberMe').value;
-        console.log(username,password,isChecked);
+        console.log(email,password);
         axios.post('/restaurant/login',{
-            username:username,
+            email:email,
             password:password,
-            isChecked:isChecked
         }).then((response)=>{
             console.log(response.data);
             if(response.data.message === 'done'){
-                window.location.href='/dashboard'
+                window.location.href='/restaurant/dashboard'
             }else if(response.data.err){
                 document.getElementById(response.data.err).classList.add('border-danger');
                 document.getElementById('alertMain').style.display='block';
@@ -98,7 +96,7 @@
     }
     function clearError(){
         document.getElementById('alertMain').style.display='none';
-        document.getElementById('username').classList.remove('border-danger');
+        document.getElementById('email').classList.remove('border-danger');
         document.getElementById('password').classList.remove('border-danger');
     }
 
