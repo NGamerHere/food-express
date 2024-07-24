@@ -11,7 +11,7 @@ restaurant.get('/restaurant/login',(req,res)=>{
 restaurant.post('/restaurant/register',async (req,res)=>{
     try {
         const { ownerName,restaurantName,cityID,stateID, password, fassiID ,phone,email } = req.body;
-        const [existingUsers] = await pool.query('SELECT * FROM restaurant WHERE restaurantName = ?', [restaurantName]);
+        const [existingUsers] = await pool.query('SELECT * FROM restaurant WHERE restaurantName = ? AND cityID=? ', [restaurantName,cityID]);
         if (existingUsers.length > 0) {
             return res.status(409).json({ message: 'this restaurant is already registered with us' ,err:'restaurantName'});
         }
@@ -19,7 +19,7 @@ restaurant.post('/restaurant/register',async (req,res)=>{
         if (emailCheck.length > 0) {
             return res.status(409).json({ message: 'email already exists',err:'email' });
         }
-        const [phoneCheck]=await pool.query('SELECT * FROM users WHERE phone = ?', [phone]);
+        const [phoneCheck]=await pool.query('SELECT * FROM restaurant WHERE phone = ?', [phone]);
         if (phoneCheck.length > 0) {
             return res.status(409).json({ message: 'phone already exists' , err:'phone'});
         }
@@ -29,7 +29,7 @@ restaurant.post('/restaurant/register',async (req,res)=>{
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const [result] = await pool.query(
-            'INSERT INTO restaurant (restaurantName, ownerName, cityID, stateID, email, phoneNo, password, fssaiID) VALUES (?, ?, ?,?,?,?,?,?)',
+            'INSERT INTO restaurant (restaurantName, ownerName, cityID, stateID, email, phone, password, fssaiID) VALUES (?, ?, ?,?,?,?,?,?)',
             [restaurantName,ownerName,cityID,stateID,email,phone,hashedPassword,fassiID]
         );
         res.status(201).json({ message: 'done', userId: result.insertId });

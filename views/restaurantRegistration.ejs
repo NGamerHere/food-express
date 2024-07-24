@@ -36,6 +36,7 @@
         <h2 class="text-center mb-4">Add the restaturant</h2>
         <form>
             <div class="mb-3">
+                <div id="restaurantNameError" class="text-danger text-center" style="display: none"> <p>this restaurant name is  already exists</p> </div>
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="restaurantName" placeholder="restaurantName" required />
                     <label for="restaurantName">restaurant Name</label>
@@ -55,7 +56,7 @@
                 </div>
             </div>
             <div class="mb-3">
-                <div id="usernameError" class="text-danger text-center" style="display: none"> <p>this username already exists</p> </div>
+                <div id="fassiIDError" class="text-danger text-center" style="display: none"> <p>this id is already registred with us</p> </div>
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="fassiID" placeholder="fassi ID"  required />
                     <label for="fassiID">FASSI code</label>
@@ -82,13 +83,22 @@
                     <label for="phone">Phone Number</label>
                 </div>
             </div>
-            <div class="mb-3">
-                <select class="form-select" aria-label="select the state" id="state" onchange="citiFetcher()">
-                </select>
-            </div>
-            <div class="mb-3">
-                <select class="form-select form-select-lg" aria-label="select the state" id="cities">
-                </select>
+            <div class="mb-3 row">
+                <div class="col">
+                    <div class="form-floating">
+                        <select class="form-select" id="state" aria-label="Floating label select example" onchange="citiFetcher()">
+
+                        </select>
+                        <label for="state">select the state</label>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-floating">
+                        <select class="form-select" id="city" aria-label="Floating label select example" >
+                        </select>
+                        <label for="city">select the city</label>
+                    </div>
+                </div>
             </div>
             <div class="mb-3 form-check">
                 <input type="checkbox" class="form-check-input" id="termsAgree" required>
@@ -106,54 +116,74 @@
 
 <script>
 
-    function registrationHandle(event){
-
+    function registrationHandle(event) {
         event.preventDefault();
         clearError();
-        const name=document.getElementById('name').value;
-        const email=document.getElementById('email').value;
-        const password=document.getElementById('password').value;
-        const repassword=document.getElementById('repassword').value;
-        const phone=document.getElementById('phone').value;
-        const username=document.getElementById('username').value;
-        if(password!== repassword){
+
+        const restaurantName = document.getElementById('restaurantName').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const repassword = document.getElementById('repassword').value;
+        const phone = document.getElementById('phone').value;
+        const ownerName = document.getElementById('ownerName').value;
+        const fassiID = document.getElementById('fassiID').value;
+        const stateID = document.getElementById('state').value;
+        const cityID = document.getElementById('city').value;
+
+        if (password !== repassword) {
             document.getElementById('repassword').classList.add('border-danger');
-            document.getElementById('passwordError').style.display='block';
+            document.getElementById('passwordError').style.display = 'block';
             return;
         }
-        axios.post('/registration',{
-            name:name,
-            email:email,
-            password:password,
-            phone:phone,
-            username:username
-        }).then(response=>{
+
+        axios.post('/restaurant/register', {
+            restaurantName: restaurantName,
+            email: email,
+            password: password,
+            phone: phone,
+            ownerName: ownerName,
+            fassiID: fassiID,
+            stateID: stateID,
+            cityID: cityID
+        }).then(response => {
             console.log(response.data);
             if(response.data.message === 'done'){
-                window.location.href='/login';
+             window.location.href='/restaurant/login';
             }
-        }).catch(error=>{
+        }).catch(error => {
             console.error(error.response.data);
-            if(error.response.data.err){
-                document.getElementById(error.response.data.err).classList.add('border-danger');
-                document.getElementById(error.response.data.err+'Error').style.display='block';
+            if (error.response.data.err) {
+                let errorElement = document.getElementById(error.response.data.err);
+                let errorField = document.getElementById(error.response.data.err + 'Error');
+
+                 errorField.innerHTML=`<p> ${error.response.data.message} </p>`;
+                if (errorElement) {
+                    errorElement.classList.add('border-danger');
+                }
+
+                if (errorField) {
+                    errorField.style.display = 'block';
+                }
             }
         });
     }
-    function clearError(){
-        document.getElementById('passwordError').style.display='none';
+
+    function clearError() {
+        document.getElementById('passwordError').style.display = 'none';
         document.getElementById('repassword').classList.remove('border-danger');
-        document.getElementById('emailError').style.display='none';
+        document.getElementById('emailError').style.display = 'none';
         document.getElementById('email').classList.remove('border-danger');
-        document.getElementById('phoneError').style.display='none';
+        document.getElementById('phoneError').style.display = 'none';
         document.getElementById('phone').classList.remove('border-danger');
-        document.getElementById('usernameError').style.display='none';
-        document.getElementById('username').classList.remove('border-danger');
+        document.getElementById('restaurantNameError').style.display = 'none';
+        document.getElementById('restaurantName').classList.remove('border-danger');
+        document.getElementById('fassiIDError').style.display = 'none';
+        document.getElementById('fassiID').classList.remove('border-danger');
     }
     function stateFetcher(){
         const select= document.getElementById('state');
         axios.get('/api/getStates').then((res)=>{
-            let str='';
+            let str=' <option > ---none--- </option> ';
             console.log(res.data);
             res.data.forEach((item)=>{
                 str=str+`<option value="${item.id}" >${item.stateName}</option>`;
@@ -164,12 +194,27 @@
         })
     }
     function citiFetcher(){
-        const stateID=document.getElementById('state').value;
-        alert(stateID);
+            const id=document.getElementById('state').value;
+            const city=document.getElementById('city');
+            city.removeAttribute('disabled')
+            axios.get('/api/getCitiesBystate?stateID='+id).then((res)=>{
+                console.log(res.data);
+                let str='';
+                console.log(res.data);
+                res.data.forEach((item)=>{
+                    str=str+`<option value="${item.id}" >${item.cityName}</option>`;
+                })
+                city.innerHTML=str;
+            }).catch((e)=>{
+                console.error("error in fetching the data"+ e);
+            })
+
     }
 
     document.addEventListener("DOMContentLoaded", (event) => {
         stateFetcher();
+        const citySelect = document.getElementById('city');
+        citySelect.setAttribute('disabled', 'disabled');
     });
 
 
