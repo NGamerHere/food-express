@@ -21,7 +21,7 @@ categories.post('/api/categories',async (req,res)=>{
 categories.get('/api/categories',async (req,res)=>{
     const userid=req.session.userId;
     try{
-        const [result]=await pool.query('select * from categories where restaurantID=?',[userid]);
+        const [result]=await pool.query('select id,categoryName from categories where restaurantID=?',[userid]);
         res.json(result);
     }catch (e) {
         console.log(e);
@@ -57,5 +57,15 @@ categories.delete('/api/categories',async (req,res)=>{
        console.log(e);
        res.status(500).json({'message':'internal server error',error:e});
    }
+});
+
+categories.get('/api/foodType',async (req, res)=>{
+    try{
+        const [result]=await pool.query('select * from foodtype');
+        res.json(result);
+    }catch (e) {
+        console.log(e);
+        res.status(500).json({'message':'internal server error',error:e});
+    }
 });
 module.exports=categories;
