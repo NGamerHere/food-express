@@ -3,26 +3,29 @@ const pool=require('../db');
 
 const categories=express.Router();
 
-
-categories.get('/getCategories',async (req,res)=>{
+categories.post('/api/categories',async (req,res)=>{
+    const userid=req.session.userId;
+    const categoryName=req.body.categoryName;
     try{
-        const [result]=await pool.query('SELECT * FROM categories');
-        res.json(result);
+        const [result]=await pool.query('insert into categories(categoryName, restaurantID) value (?,?)',[categoryName,userid]);
+        if(result['affectedRows'] > 0 ){
+            res.json({'message':'done'});
+        }else{
+            res.status(500).json({'message':'error'});
+        }
     }catch (e) {
-        res.status(500).send({message:'internalServerError'})
-        console.error('error in fetching the all the categories '+e)
-    }
-})
-
-categories.get('/getItems',async (req,res)=>{
-    const categoriesID=req.query.categoriesID;
-    try{
-        const [result]=await pool.query('SELECT * FROM items WHERE categoriesID=?',[categoriesID]);
-        res.json(result);
-    }catch (e) {
-        res.status(500).send({message:'internalServerError'})
-        console.error('error in fetching the all the categories '+e)
+        console.log(e);
+        res.status(500).json({'message':'internal server error',error:e});
     }
 });
-
+categories.get('/api/categories',async (req,res)=>{
+    const userid=req.session.userId;
+    try{
+        const [result]=await pool.query('select * from categories where restaurantID=?',[userid]);
+        res.json(result);
+    }catch (e) {
+        console.log(e);
+        res.status(500).json({'message':'internal server error',error:e});
+    }
+})
 module.exports=categories;
