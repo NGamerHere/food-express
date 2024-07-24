@@ -11,7 +11,8 @@ const restaurant=require('./routes/restaurant');
 const sessionStore=require('./components/sessionStore');
 const state=require('./routes/states');
 const city=require('./routes/city');
-const testing=require('./routes/testing')
+const testing=require('./routes/testing');
+const items=require('./routes/items')
 require('dotenv').config();
 
 const app = express();
@@ -40,6 +41,7 @@ app.use(restaurant);
 app.use(state)
 app.use(city)
 app.use(testing);
+app.use(items)
 
 
 const port = process.env.PORT;
