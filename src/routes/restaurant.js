@@ -68,10 +68,26 @@ restaurant.get('/restaurant/registration',(req,res)=>{
 });
 
 
-restaurant.get('/restaurant/dashboard',async (req,res)=>{
-   const [name]=await pool.query('select * from restaurant where id=?',[req.session.userId]);
-    res.render('restaurantDashboard',{name:name[0].ownerName})
+restaurant.get('/restaurant/dashboard', async (req, res) => {
+    try {
+        // Execute query to fetch restaurant details
+        const [rows] = await pool.query('SELECT * FROM restaurant WHERE id = ?', [req.session.userId]);
+
+        // Check if any results were returned
+        if (rows.length > 0) {
+            // Render the page with the owner's name
+            res.render('restaurantDashboard', { name: rows[0].ownerName });
+        } else {
+            // Handle case where no restaurant is found
+            res.status(404).send('Restaurant not found');
+        }
+    } catch (error) {
+        // Handle any errors that occur during the query
+        console.error('Error fetching restaurant details:', error);
+        res.status(500).send('Server error');
+    }
 });
+
 
 restaurant.get('/restaurant/logout',async (req,res)=>{
     req.session.destroy();
