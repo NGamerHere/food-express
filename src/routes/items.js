@@ -10,7 +10,29 @@ items.get('/api/items',async (req, res) => {
         res.json(result);
     } catch (e) {
         console.error(e);
-        res.status(500).json({ message: 'An error occurred while adding the item' });
+        res.status(500).json({ message: 'An error occurred while getting the item' });
+    }
+});
+
+items.get('/api/items/singleItem',async (req,res)=>{
+    try {
+        const itemID = req.query.id;
+        const [result] = await pool.query('select * from items where id=?',[itemID] );
+        res.json(result[0]);
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ message: 'An error occurred while getting the item' });
+    }
+})
+
+items.get('/api/items/getCount',async (req,res)=>{
+    try {
+        const restaurantID = req.session.userId;
+        const [result] = await pool.query('select categoryName,count(*) as count_name from items inner join categories on items.categoryID = categories.id where items.restaurantID=? group by categoryName;',[restaurantID] );
+        res.json(result);
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ message: 'An error occurred while getting the item count' });
     }
 });
 

@@ -27,7 +27,9 @@ categories.get('/api/categories',async (req,res)=>{
         console.log(e);
         res.status(500).json({'message':'internal server error',error:e});
     }
-})
+});
+
+
 categories.patch('/api/categories',async (req,res)=>{
     const userid=req.session.userId;
     const id=req.body.id;
@@ -61,7 +63,7 @@ categories.delete('/api/categories',async (req,res)=>{
 
 categories.get('/api/foodType',async (req, res)=>{
     try{
-        const [result]=await pool.query('select * from foodtype');
+        const [result]=await pool.query('select * from foodType');
         res.json(result);
     }catch (e) {
         console.log(e);
