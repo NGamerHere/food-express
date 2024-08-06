@@ -70,7 +70,12 @@ restaurant.get('/restaurant/registration',(req,res)=>{
 
 restaurant.get('/restaurant/dashboard',async (req,res)=>{
    const [name]=await pool.query('select * from restaurant where id=?',[req.session.userId]);
-    res.render('restaurantDashboard',{name:name[0]['ownerName']})
+    res.render('restaurantDashboard',{name:name[0].ownerName})
 });
+
+restaurant.get('/restaurant/logout',async (req,res)=>{
+    req.session.destroy();
+    res.redirect('/restaurant/login');
+})
 
 module.exports=restaurant;
