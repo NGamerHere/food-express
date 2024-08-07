@@ -148,6 +148,7 @@
             closebtn.click();
             clear();
             categoriesFetch();
+        categoryCountFetcher();
         }).catch((e)=>{
             console.error(e);
         })
@@ -167,6 +168,7 @@
             const closebtn=document.getElementById('addItemsClose');
             closebtn.click();
             categoriesFetch();
+        categoryCountFetcher();
             itemsFetcher();
             clear();
         }).catch((e)=>{
