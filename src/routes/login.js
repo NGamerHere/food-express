@@ -20,6 +20,7 @@ login.post('/login',loginAPIHandle, async (req, res) => {
             const match = await bcrypt.compare(password, user.password);
             if (match) {
                 req.session.userId = user.id;
+                req.session.role='customer';
                 res.json({ message: 'done' });
             } else {
                 res.json({ message: 'Wrong password' ,err:'password'});
