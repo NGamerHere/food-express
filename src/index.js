@@ -14,6 +14,7 @@ const city=require('./routes/city');
 const testing=require('./routes/testing');
 const items=require('./routes/items');
 const RDapi=require('./routes/RDapi');
+const restaurantProfile=require('./routes/restaurantProfile');
 require('dotenv').config();
 
 const app = express();
@@ -44,6 +45,7 @@ app.use(city)
 app.use(testing);
 app.use(items);
 app.use(RDapi);
+app.use(restaurantProfile);
 
 
 const port = process.env.PORT;
